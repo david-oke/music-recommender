@@ -1,3 +1,3 @@
 # music-recommender
 
-Spotify Recommender Project for HackPricneton
+Spotify Recommender Project for HackPrinceton
