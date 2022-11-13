@@ -9,7 +9,7 @@ var spotifyApi = new SpotifyWebApi({
 var access_token = "BQBZFmpyI_eBjlb7C4xY8BeQ3XmS-GwbX55fpm6mBczNcWKBXadfzNQpgrf3Et90X1vS2EQKR6yBBoV1MZ9d75WvsEHHrP6OGvRKfRDcxqrExCqzSvOJp0QqUyG9KDZfpfo8HzQGGtOCBckPcAF63GZdCQOrVOik4LPiY8t_NlRC1EUtFzi5bcyw6EgclUXBjLey9Pv1M09ifCRUOnYSPO_K3lGnuKS7DPNtnsu4GCxmlDGzUzTAARTmfQf1FQCmoz_v970swuwlgs5s2oUVJqPRGBV3pA"
 spotifyApi.setAccessToken(access_token);
 
-const API_CALL_LIMIT = 20;
+// const API_CALL_LIMIT = 20;
 
 async function getTopTracks() {
     let savedTracks = "";
