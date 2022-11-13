@@ -14,7 +14,9 @@ const API_CALL_LIMIT = 20;
 async function getTopTracks() {
     let savedTracks = "";
     var data = await spotifyApi.getMyTopTracks({
-        limit: 5
+        limit: 5,
+        time_range: "long_term",
+        offset: 5
     }).then(function(data) {
         var tracks = data.body.items;
         for(var i = 0; i < tracks.length; i++) {
@@ -46,7 +48,6 @@ async function getRecommendations(tracks) {
             let trackName = tracks.at(i).name;
             let trackId = tracks.at(i).uri;
             // savedTracks += trackId + ",";
-            savedTracks.push(trackId)
             fs.writeFileSync('/Users/davidoke/Desktop/Programming/music-recommender/recommendations.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
                 if (err) {
                   console.error(err);
