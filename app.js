@@ -38,6 +38,7 @@ async function getTopTracks() {
 }
 
 async function getRecommendations(tracks) {
+    let savedTracks = "";
     var data = await spotifyApi.getRecommendations({
         seed_artists: "",
         seed_genres: "",
@@ -46,8 +47,8 @@ async function getRecommendations(tracks) {
         var tracks = data.body.tracks;
         for(var i = 0; i < tracks.length; i++) {
             let trackName = tracks.at(i).name;
-            let trackId = tracks.at(i).uri;
-            // savedTracks += trackId + ",";
+            let trackId = tracks.at(i).uri.slice(14);
+            savedTracks += trackId + ",";
             fs.writeFileSync('/Users/davidoke/Desktop/Programming/music-recommender/recommendations.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
                 if (err) {
                   console.error(err);
@@ -57,6 +58,7 @@ async function getRecommendations(tracks) {
       }, function(err) {
         console.log('Something went wrong!', err);
       });
+    return savedTracks
 }
 var str = await getTopTracks();
 console.log(str)
