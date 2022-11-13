@@ -4,13 +4,14 @@ import { Console } from 'console';
 
 var spotifyApi = new SpotifyWebApi({
     clientId: 'aad19679bf2e4f0f867447e17587fe1e',
-    clientSecret: 'c13b5f227ebb4a609e0efeca826a099c',
+    clientSecret: '',   // Hidden for GitHub
     redirectUri: 'http://localhost:8888/callback'
   });
-var access_token = "BQCyH_k1AJXeR5eZiEHOuKF8BPtbzFO45j62HN2aarYfI_gXLkP_zbu9H1tTw70JalWRZPDEcdDtkL4MjUyS-e408DUcOIlGrGmKM0JDT3FOkhQ0P94ETr5Jmsfyhf3dW16uQqD5Az1btnruOAIQ9Z0_8BV8JG5QAYqtEcE6FdwT24zuoVcQDB75hOESYElfYDPU8Uy55cqc0Ao7ah02vO3b5tdmkbdZy85RVV9oPnY98XF5gN5U7sWVcjoZveziuY_RPdxK5uKQ0zPQ0Z-PLQ9CdzQoHA"
+var access_token = "" // Hidden for GitHub
 spotifyApi.setAccessToken(access_token);
 
-// const API_CALL_LIMIT = 20;
+
+const OLD_NASSAU_ID = "spotify:track:5I009U28vJ5XbommnrsvAr"
 
 async function getTopTracks() {
     let ret = []
@@ -27,7 +28,7 @@ async function getTopTracks() {
             let trackId = tracks.at(i).uri.slice(14);
             savedTracks += trackId + ",";
             savedTracksNames.push(trackName);
-            fs.writeFileSync('/Users/davidoke/Desktop/Programming/music-recommender/tracks.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
+            fs.writeFileSync('./tracks.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
                 if (err) {
                   console.error(err);
                 }
@@ -59,7 +60,7 @@ async function getRecommendations(tracks) {
             savedTracks += trackId + ",";
             savedTracksNames.push(trackName);
             savedArtistNames.push(artistName);
-            fs.writeFileSync('/Users/davidoke/Desktop/Programming/music-recommender/recommendations.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
+            fs.writeFileSync('./recommendations.txt', JSON.stringify(trackName) + " : " + JSON.stringify(trackId) + "\n", { flag: 'a+' },err => {
                 if (err) {
                   console.error(err);
                 }
@@ -74,8 +75,44 @@ async function getRecommendations(tracks) {
     return ret;
 }
 
+// Creates a playlist
+async function createPlaylist(title, description, isPublic) {
+    let playlistId = "";
+    var data = await spotifyApi.createPlaylist(title, { 
+        'description': description, 
+        'public': isPublic 
+    }).then(function(data) {
+        console.log('Created playlist: ' + title);
+        playlistId = data.body.id;
+  }, function(err) {
+        console.log('Something went wrong!', err);
+  });
+  return playlistId;
+}
+
+// Populates a playlist
+async function populatePlaylist(playlistId, trackURIs) {
+    await spotifyApi.addTracksToPlaylist(playlistId, trackURIs)
+    .then(function(data) {}, function(err) { 
+        console.log('Something went wrong!', err); 
+    });
+}
+
+console.log("--------------Spotify Music Recommender----------------\n")
 var topTracks = await getTopTracks();
 var recommendations = await getRecommendations(topTracks[0]);
+var recommendIds = recommendations[0];
+recommendIds = recommendIds.slice(0, -1);
+recommendIds = recommendIds.replaceAll(",", ",spotify:track:");
+var str = "spotify:track:"
+recommendIds = str.concat(recommendIds);
+var idsArr = recommendIds.split(",");
+idsArr.push(OLD_NASSAU_ID);
+
+var playlistId = await createPlaylist("Recommended Songs", "We recommend you try these tracks", true);
+await populatePlaylist(playlistId, idsArr);
+
+
 
 console.log("Based on your listening activity, we recommend you try: ")
 console.log("------------------------------------------------------\n")
@@ -83,5 +120,6 @@ console.log("------------------------------------------------------\n")
 for(var i = 0; i < recommendations[1].length; i++) {
     console.log(recommendations[1][i] + " by " + recommendations[2][i]);
 }
+console.log("Old Nassau" + " by " + "The Princeton Nassoons");
 
 console.log("\n------------------------------------------------------\n")
